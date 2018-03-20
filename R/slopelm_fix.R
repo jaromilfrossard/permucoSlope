@@ -248,7 +248,7 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
                                                                                                          "tfce", "troendle", "bonferroni", "holm", "benjaminin_hochberg")]
   out = list()
   out$y = y
-  outt$sy = sy
+  out$sy = sy
   out$coefficients = mod_lm$coefficients
   out$residuals = mod_lm$residuals
   out$effects = mod_lm$effects
