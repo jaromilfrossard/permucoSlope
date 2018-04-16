@@ -196,10 +196,11 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
                                                  E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
 
 
-    multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
-                                                                           threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
-
-
+    if("glue"%in%multcomp){
+      multiple_comparison[[i]]$slope_clustermass = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
+               threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")}else{
+      multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
+               threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")}
 
 
     if (test == "t") {

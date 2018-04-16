@@ -132,8 +132,19 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
                                                  distribution = distribution, threshold = threshold[i],
                                                  aggr_FUN = aggr_FUN, laterality = "bilateral",
                                                  E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
-    multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
-                                                                           threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+
+    #arg <<- list(distribution = distribution, sdistribution = sdistribution,
+    #            threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+    #stop()
+
+    if("glue"%in%multcomp){
+      multiple_comparison[[i]]$slope_clustermass = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
+                                                                             threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+    }else{
+      multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
+                                                                             threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+
+    }
 
   }
   cluster_table <- permuco:::cluster_table(multiple_comparison[order(link[3,
