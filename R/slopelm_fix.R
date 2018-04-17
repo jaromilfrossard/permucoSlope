@@ -89,7 +89,7 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
     names(colx) <- colnames(mm)[colx]
   })
   if (!is.null(P)) {
-    check_P <- check_P(P = P, method = method, test = test,
+    check_P <- permuco:::check_P(P = P, method = method, test = test,
                        n = NROW(y), ncol_x2 = as.numeric(table(attr(mm,
                                                                     "assign")[attr(mm, "assign") != 0])), ncol_x = NCOL(mm))
     if (!check_P) {
@@ -194,6 +194,10 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
                                                  distribution = distribution, threshold = threshold[i],
                                                  aggr_FUN = aggr_FUN, laterality = "bilateral",
                                                  E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
+
+    # arg <<- list(distribution = distribution, sdistribution = sdistribution,
+    #            threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+    # stop()
 
 
     if("glue"%in%multcomp){

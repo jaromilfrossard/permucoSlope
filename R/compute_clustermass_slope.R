@@ -1,3 +1,4 @@
+#distribution= arg$distribution;sdistribution=arg$sdistribution;threshold=arg$threshold;aggr_FUN=arg$aggr_FUN;laterality=arg$laterality
 
 compute_clustermass_slope <- function (distribution, sdistribution, threshold, aggr_FUN, laterality = "bilateral"){
   switch(laterality,
@@ -17,8 +18,8 @@ compute_clustermass_slope <- function (distribution, sdistribution, threshold, a
   cl = selected*cl_join
   scl = sselected*cl_join
 
-  mass_distribution = sapply(1:dim(selected_join)[1],function(permi){
-    max(sapply(1:max(cl[permi,]),function(i_in_p){
+  mass_distribution = sapply(1:(dim(selected_join)[1]),function(permi){
+    max(sapply(1:max(cl_join[permi,]),function(i_in_p){
       aggr_FUN(c(distribution[permi,cl[permi,]==i_in_p],
                  sdistribution[permi,scl[permi,]==i_in_p]))}))})
 
