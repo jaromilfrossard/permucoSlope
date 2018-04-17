@@ -195,9 +195,9 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
                                                  aggr_FUN = aggr_FUN, laterality = "bilateral",
                                                  E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
 
-    # arg <<- list(distribution = distribution, sdistribution = sdistribution,
-    #            threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
-    # stop()
+    arg <<- list(distribution = distribution, sdistribution = sdistribution,
+               threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+    stop()
 
 
     if("glue"%in%multcomp){

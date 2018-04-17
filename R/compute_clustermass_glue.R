@@ -46,11 +46,11 @@ compute_clustermass_glue <- function (distribution, sdistribution, threshold, ag
 
 
   mass_distribution = sapply(1:(dim(selected_join)[1]),function(permi){
-    max(sapply(1:max(cl_join[permi,]),function(i_in_p){
+    max(sapply(1:max(1,max(cl_join[permi,])),function(i_in_p){
       aggr_FUN(c(distribution[permi,cl[permi,]==i_in_p],
                  sdistribution[permi,scl[permi,]==i_in_p]))}))})
 
-  mass_statistic = sapply(1:max(cl_join[1,]), function(i) {
+  mass_statistic = sapply(1:max(1,max(cl_join[1,])), function(i) {
     aggr_FUN(c(distribution[1,cl[1,]==i],
                sdistribution[1,scl[1,]==i]))
   })
