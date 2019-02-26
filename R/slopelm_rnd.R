@@ -125,24 +125,24 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
     if (p_scale) {
       distribution0 <- distribution
       distribution <- permuco:::distribution_to_pscale(distribution0,
-                                             test = test, lateraltiy = "bilateral")
+                                             test = test, alternative = "two.sided")
     }
     multiple_comparison[[i]] = c(multiple_comparison[[i]],
                                  permuco:::switch_multcomp(multcomp = c("clustermass", multcomp),
                                                  distribution = distribution, threshold = threshold[i],
-                                                 aggr_FUN = aggr_FUN, laterality = "bilateral",
+                                                 aggr_FUN = aggr_FUN, alternative = "two.sided",
                                                  E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
 
     #arg <<- list(distribution = distribution, sdistribution = sdistribution,
-    #            threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+    #            threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
     #stop()
 
     if("glue"%in%multcomp){
       multiple_comparison[[i]]$slope_clustermass = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
-                                                                             threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+                                                                             threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
     }else{
       multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
-                                                                             threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+                                                                             threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
 
     }
 

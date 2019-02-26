@@ -1,8 +1,8 @@
-#distribution= arg$distribution;sdistribution=arg$sdistribution;threshold=arg$threshold;aggr_FUN=arg$aggr_FUN;laterality=arg$laterality
+#distribution= arg$distribution;sdistribution=arg$sdistribution;threshold=arg$threshold;aggr_FUN=arg$aggr_FUN;alternative=arg$alternative
 
-compute_clustermass_slope <- function (distribution, sdistribution, threshold, aggr_FUN, laterality = "bilateral"){
-  switch(laterality,
-         bilateral = {
+compute_clustermass_slope <- function (distribution, sdistribution, threshold, aggr_FUN, alternative = "two.sided"){
+  switch(alternative,
+         two.sided = {
     distribution <- abs(distribution)
     sdistribution <- abs(sdistribution)
     threshold <- abs(threshold)
@@ -29,7 +29,7 @@ compute_clustermass_slope <- function (distribution, sdistribution, threshold, a
   })
 
   pvalue = sapply(mass_statistic, function(mi) permuco:::compute_pvalue(stat = mi,
-                                                                              distribution = mass_distribution, laterality = "bilateral"))
+                                                                              distribution = mass_distribution, alternative = "two.sided"))
 
 
   main = cbind(statistic =c(NA, mass_statistic)[cl_join[1, ] + 1],

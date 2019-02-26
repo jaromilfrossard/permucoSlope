@@ -15,14 +15,14 @@ slope_spline <- function(y, spar = .5){t(apply(y, 1, function(yi)predict(smooth.
 #' @param bw a scalar representing the bandwidth. The Default value is \code{.01}.
 #' @param kernel a function representing for the kernel. By default the Epanechnikov Kernel.
 #' @param deg a integer representing the degree of the polynomial use to fit the signal. Default value is \code{1}.
-#' @importFrom locpol locpol fitted.locpol EpaK
+#' @importFrom locpol locpol EpaK
 #' @export
 slope_locpol = function(y, bw = 0.01, kernel = EpaK , deg = 1){
   xi = c(1:NCOL(y))/NCOL(y)
   out= apply(y, 1, function(yi){
     df = data.frame(xi = xi, y = yi)
     out = locpol(yi~xi, data = df, bw = bw, kernel = kernel, deg = deg, xeval = xi)
-    fitted.locpol(out, deg = 1)})
+    locpol:::fitted.locpol(out, deg = 1)})
   t(out)
 }
 

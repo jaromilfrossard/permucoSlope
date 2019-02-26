@@ -126,12 +126,12 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
   length(multiple_comparison) <- length(colx)
   names(multiple_comparison)  <- names(colx)
   if (test == "t") {
-    multiple_comparison_left <- multiple_comparison_right <- list()
-    length(multiple_comparison_left) <- length(multiple_comparison_right) <- length(colx)
-    names(multiple_comparison_left) <- names(multiple_comparison_right) <- names(colx)
+    multiple_comparison_less <- multiple_comparison_greater <- list()
+    length(multiple_comparison_less) <- length(multiple_comparison_greater) <- length(colx)
+    names(multiple_comparison_less) <- names(multiple_comparison_greater) <- names(colx)
   }
   else {
-    multiple_comparison_left <- multiple_comparison_right <- NULL
+    multiple_comparison_less <- multiple_comparison_greater <- NULL
   }
   if (is.null(threshold)) {
     switch(test, t = {
@@ -183,69 +183,69 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
     if (p_scale) {
       distribution0 <- distribution
       distribution <- permuco:::distribution_to_pscale(distribution0,
-                                             test = test, lateraltiy = "bilateral")
+                                             test = test, alternative = "two.sided")
       sdistribution0 <- sdistribution
       sdistribution <- permuco:::distribution_to_pscale(sdistribution0,
-                                             test = test, lateraltiy = "bilateral")
+                                             test = test, alternative = "two.sided")
 
     }
     multiple_comparison[[i]] = c(multiple_comparison[[i]],
                                  permuco:::switch_multcomp(multcomp = c("clustermass", multcomp),
                                                  distribution = distribution, threshold = threshold[i],
-                                                 aggr_FUN = aggr_FUN, laterality = "bilateral",
+                                                 aggr_FUN = aggr_FUN, alternative = "two.sided",
                                                  E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
 
     # arg <<- list(distribution = distribution, sdistribution = sdistribution,
-    #            threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")
+    #            threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
     # stop()
 
 
     if("glue"%in%multcomp){
       multiple_comparison[[i]]$slope_clustermass = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
-               threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")}else{
+               threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")}else{
       multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
-               threshold = threshold[i], aggr_FUN =aggr_FUN,laterality = "bilateral")}
+               threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")}
 
 
     if (test == "t") {
-      lateraltiy = "right"
+      alternative = "greater"
       if (p_scale) {
         distribution <- permuco:::distribution_to_pscale(distribution0,
-                                               test = test, lateraltiy = lateraltiy)
+                                               test = test, alternative = alternative)
       }
       pvalue <- apply(distribution, 2, function(col) permuco:::compute_pvalue(distribution = col,
-                                                                    laterality = lateraltiy))
-      multiple_comparison_right[[i]]$uncorrected = list(main = cbind(statistic = distribution[1,
+                                                                    alternative = alternative))
+      multiple_comparison_greater[[i]]$uncorrected = list(main = cbind(statistic = distribution[1,
                                                                                               ], pvalue = pvalue))
-      multiple_comparison_right[[i]] = c(multiple_comparison_right[[i]],
+      multiple_comparison_greater[[i]] = c(multiple_comparison_greater[[i]],
                                          permuco:::switch_multcomp(multcomp = c("clustermass", multcomp[!multcomp %in%
                                                                                                 "tfce"]), distribution = distribution, threshold = threshold[i],
-                                                         aggr_FUN = aggr_FUN, laterality = lateraltiy,
+                                                         aggr_FUN = aggr_FUN, alternative = alternative,
                                                          E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
-      lateraltiy = "left"
+      alternative = "less"
       if (p_scale) {
         distribution <- permuco:::distribution_to_pscale(distribution0,
-                                               test = test, lateraltiy = "left")
-        lateraltiy = "right"
+                                               test = test, alternative = "less")
+        alternative = "greater"
       }
       pvalue <- apply(distribution, 2, function(col) permuco:::compute_pvalue(distribution = col,
-                                                                    laterality = lateraltiy))
-      multiple_comparison_left[[i]]$uncorrected = list(main = cbind(statistic = distribution[1,
+                                                                    alternative = alternative))
+      multiple_comparison_less[[i]]$uncorrected = list(main = cbind(statistic = distribution[1,
                                                                                              ], pvalue = pvalue))
-      multiple_comparison_left[[i]] = c(multiple_comparison_left[[i]],
+      multiple_comparison_less[[i]] = c(multiple_comparison_less[[i]],
                                         permuco:::switch_multcomp(multcomp = c("clustermass", multcomp[!multcomp %in%
                                                                                                "tfce"]), distribution = distribution, threshold = threshold[i],
-                                                        aggr_FUN = aggr_FUN, laterality = lateraltiy,
+                                                        aggr_FUN = aggr_FUN, alternative = alternative,
                                                         E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
     }
   }
   cluster_table <- permuco:::cluster_table(multiple_comparison)
   slope_table <- slope_table(multiple_comparison)
 
-  cluster_table_right <- cluster_table_left <- NULL
+  cluster_table_greater <- cluster_table_less <- NULL
   if (test == "t") {
-    cluster_table_right <- permuco:::cluster_table(multiple_comparison_right)
-    cluster_table_left <- permuco:::cluster_table(multiple_comparison_left)
+    cluster_table_greater <- permuco:::cluster_table(multiple_comparison_greater)
+    cluster_table_less <- permuco:::cluster_table(multiple_comparison_less)
   }
   mod_lm = lm.fit(x = mm, y = y)
   multcomp = unique(c("uncorrected", "clustermass", multcomp))[unique(c("uncorrected",
@@ -273,12 +273,12 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
   out$rnd_rotation = rnd_rotation
   out$multcomp = multcomp
   out$multiple_comparison = multiple_comparison
-  out$multiple_comparison_right = multiple_comparison_right
-  out$multiple_comparison_left = multiple_comparison_left
+  out$multiple_comparison_greater = multiple_comparison_greater
+  out$multiple_comparison_less = multiple_comparison_less
   out$cluster_table = cluster_table
   out$slope_table = slope_table
-  out$cluster_table_right = cluster_table_right
-  out$cluster_table_left = cluster_table_left
+  out$cluster_table_greater = cluster_table_greater
+  out$cluster_table_less = cluster_table_less
   out$alpha = alpha
   out$method = method
   out$fun_name = fun_name

@@ -5,7 +5,7 @@
 \title{Plot method for slopelm object}
 \usage{
 \method{plot}{slopelm}(x, effect = "all", type = "statistic",
-  multcomp = "slope_clustermass", laterality = "bilateral",
+  multcomp = "slope_clustermass", alternative = "two.sided",
   enhanced_stat = FALSE, ...)
 }
 \arguments{
@@ -17,7 +17,7 @@
 
 \item{multcomp}{a character string indicating which multiple comparison procedure should be plotted. Default is \code{"slope_clustermass"}.}
 
-\item{laterality}{a character string indicating the laterality of the test in the case of a \code{t} test. Default is \code{"bilateral"}.}
+\item{alternative}{a character string indicating the alternative of the test in the case of a \code{t} test. Default is \code{"two.sided"}.}
 
 \item{enhanced_stat}{a logical indicating if the enhanced statistic should be plotted instead of the univarite one. Default is \code{FALSE}.}
 

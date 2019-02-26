@@ -5,22 +5,22 @@
 #' @param effect a character string indicating the object to plot. Default is \code{"all"}.
 #' @param type a character string indicating if the statistic of the coefficient should be plotted. Default is \code{"statistic"}.
 #' @param multcomp a character string indicating which multiple comparison procedure should be plotted. Default is \code{"slope_clustermass"}.
-#' @param laterality a character string indicating the laterality of the test in the case of a \code{t} test. Default is \code{"bilateral"}.
+#' @param alternative a character string indicating the alternative of the test in the case of a \code{t} test. Default is \code{"two.sided"}.
 #' @param enhanced_stat a logical indicating if the enhanced statistic should be plotted instead of the univarite one. Default is \code{FALSE}.
 #' @param ... other argument pass to \code{plot}
 #'@export
 #'@importFrom graphics abline lines par plot points
 plot.slopelm <- function (x, effect = "all", type = "statistic", multcomp = "slope_clustermass",
-                          laterality = "bilateral", enhanced_stat = FALSE, ...){
+                          alternative = "two.sided", enhanced_stat = FALSE, ...){
 
-  if( (multcomp == "slope_clustermass")&(laterality != "bilateral")){
-    warning("laterality argument switch to bilateral, change multcomp argument. Only the bilateral test is available for slope_clustermass")
-    laterality = "bilateral"
+  if( (multcomp == "slope_clustermass")&(alternative != "two.sided")){
+    warning("alternative argument switch to two.sided, change multcomp argument. Only the two.sided test is available for slope_clustermass")
+    alternative = "two.sided"
   }
 
   if(multcomp != "slope_clustermass"){
     permuco:::plot.clusterlm(x = x, effect = effect, type = type, multcomp = multcomp,
-                             laterality = laterality, enhanced_stat = enhanced_stat, ...)
+                             alternative = alternative, enhanced_stat = enhanced_stat, ...)
   }else{
 
     if ("all" %in% effect) {
