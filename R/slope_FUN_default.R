@@ -38,6 +38,25 @@ slope_diff = function(y){
 }
 
 
+#' Compute the slope of multiple signal using Fourier
+#'
+#' @description compute the slope of multiple signal using the differentiation in the spectral space
+#' @param y a matrix with multiple signals in rows and time in column
+#' @param ratio_max_mod a scalar indicating the limit a frequency deleted based on the maximal value of the amplitude of the signal.
+#' @importFrom spectral spec.fft
+#' @export
+slope_spectral = function(y, ratio_max_mod = 10){
+  out = t(apply(y,1,function(yi){
+    ffti = spec.fft(y = as.numeric(scale(yi)), center = TRUE)
+    ffti$A[Mod(ffti$A)<(max(Mod(ffti$A))/ratio_max_mod)]=0
+    ffti$A <- ffti$A * 2 * pi * 1i * ffti$fx
+    Re(spec.fft(ffti)$y)
+  }))
+
+  return(out)
+}
+
+
 
 #' Compute the slope of multiple signal using and adjust the smoothing paramter
 #'
