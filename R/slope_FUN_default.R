@@ -26,6 +26,18 @@ slope_locpol = function(y, bw = 0.01, kernel = EpaK , deg = 1){
   t(out)
 }
 
+#' Compute the slope of multiple signal using time difference
+#'
+#' @description compute the slope of multiple signal using the \code{diff} function.
+#' @param y a matrix with multiple signals in rows and time in column
+#' @export
+slope_diff = function(y){
+  out = t(apply(y,1,diff))
+  out = cbind(out[,1],out)
+  return(out)
+}
+
+
 
 #' Compute the slope of multiple signal using and adjust the smoothing paramter
 #'

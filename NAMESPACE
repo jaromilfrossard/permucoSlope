@@ -2,6 +2,7 @@
 
 S3method(plot,slopelm)
 S3method(print,slopelm)
+export(slope_diff)
 export(slope_locpol)
 export(slope_roughtness)
 export(slope_spline)
