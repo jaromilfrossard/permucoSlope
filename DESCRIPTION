@@ -1,7 +1,7 @@
 Package: permucoSlope
 Type: Package
 Title: Extension of the permuco package 
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
   person("Jaromil","Frossard", email = "jaromil.frossard@unige.ch",role = c("aut", "cre")),
   person("Olivier","Renaud",email="olivier.renaud@unige.ch",role=c("aut")))

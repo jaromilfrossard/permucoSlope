@@ -171,14 +171,15 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
     pvalue <- apply(distribution, 2, function(col) permuco:::compute_pvalue(distribution = col))
     spvalue <- apply(sdistribution, 2, function(col) permuco:::compute_pvalue(distribution = col))
 
-    multiple_comparison[[i]]$uncorrected = list(main = cbind(statistic = distribution[1,], pvalue = pvalue))
-    multiple_comparison[[i]]$uncorrected_slope = list(main = cbind(statistic = sdistribution[1,], pvalue = spvalue))
-
-
+    multiple_comparison[[i]]$uncorrected = list(main_avg = cbind(statistic = distribution[1,], pvalue = pvalue),
+                                                main_slope = cbind(statistic = sdistribution[1,], pvalue = spvalue),
+                                                test_info = list(test = test, df = df[i,], alternative = "two.sided", method = method, np = np,
+                                                                 nDV = ncol(y), fun_name = fun_name))
 
     if (return_distribution) {
       multiple_comparison[[i]]$uncorrected$distribution = distribution
-      multiple_comparison[[i]]$uncorrected$distribution = list(distribution = distribution, sdistribution = sdistribution)
+      multiple_comparison[[i]]$uncorrected$sdistribution = sdistribution
+
     }
     if (p_scale) {
       distribution0 <- distribution
@@ -189,22 +190,24 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
                                              test = test, alternative = "two.sided")
 
     }
-    multiple_comparison[[i]] = c(multiple_comparison[[i]],
-                                 permuco:::switch_multcomp(multcomp = c("clustermass", multcomp),
-                                                 distribution = distribution, threshold = threshold[i],
-                                                 aggr_FUN = aggr_FUN, alternative = "two.sided",
-                                                 E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
+    # multiple_comparison[[i]] = c(multiple_comparison[[i]],
+    #                              permuco:::switch_multcomp(multcomp = c(multcomp),
+    #                                              distribution = distribution, threshold = threshold[i],
+    #                                              aggr_FUN = aggr_FUN, alternative = "two.sided",
+    #                                              E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
 
     # arg <<- list(distribution = distribution, sdistribution = sdistribution,
     #            threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
     # stop()
 
+    if("slope"%in%multcomp){
+      multiple_comparison[[i]]$slope = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
+                                                                 threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
+    }else if("glue"%in%multcomp){
+      multiple_comparison[[i]]$glue = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
+                                                               threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
 
-    if("glue"%in%multcomp){
-      multiple_comparison[[i]]$slope_clustermass = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
-               threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")}else{
-      multiple_comparison[[i]]$slope_clustermass = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
-               threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")}
+    }
 
 
     if (test == "t") {
@@ -239,18 +242,18 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
                                                         E = E, H = H, ndh = ndh, pvalue = pvalue, alpha = alpha))
     }
   }
-  cluster_table <- permuco:::cluster_table(multiple_comparison)
-  slope_table <- slope_table(multiple_comparison)
-
-  cluster_table_greater <- cluster_table_less <- NULL
-  if (test == "t") {
-    cluster_table_greater <- permuco:::cluster_table(multiple_comparison_greater)
-    cluster_table_less <- permuco:::cluster_table(multiple_comparison_less)
-  }
+  # cluster_table <- permuco:::cluster_table(multiple_comparison)
+  # slope_table <- slope_table(multiple_comparison)
+  #
+  # cluster_table_greater <- cluster_table_less <- NULL
+  # if (test == "t") {
+  #   cluster_table_greater <- permuco:::cluster_table(multiple_comparison_greater)
+  #   cluster_table_less <- permuco:::cluster_table(multiple_comparison_less)
+  # }
   mod_lm = lm.fit(x = mm, y = y)
-  multcomp = unique(c("uncorrected", "clustermass", multcomp))[unique(c("uncorrected",
-                                                                        "clustermass", multcomp)) %in% c("uncorrected", "clustermass",
-                                                                                                         "tfce", "troendle", "bonferroni", "holm", "benjaminin_hochberg")]
+  # multcomp = unique(c("uncorrected", "clustermass", multcomp))[unique(c("uncorrected",
+  #                                                                       "clustermass", multcomp)) %in% c("uncorrected", "clustermass",
+  #                                                                                                        "tfce", "troendle", "bonferroni", "holm", "benjaminin_hochberg")]
   out = list()
   out$y = y
   out$sy = sy
@@ -275,10 +278,10 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
   out$multiple_comparison = multiple_comparison
   out$multiple_comparison_greater = multiple_comparison_greater
   out$multiple_comparison_less = multiple_comparison_less
-  out$cluster_table = cluster_table
-  out$slope_table = slope_table
-  out$cluster_table_greater = cluster_table_greater
-  out$cluster_table_less = cluster_table_less
+  # out$cluster_table = cluster_table
+  # out$slope_table = slope_table
+  # out$cluster_table_greater = cluster_table_greater
+  # out$cluster_table_less = cluster_table_less
   out$alpha = alpha
   out$method = method
   out$fun_name = fun_name

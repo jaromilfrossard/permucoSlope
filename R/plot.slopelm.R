@@ -10,15 +10,19 @@
 #' @param ... other argument pass to \code{plot}
 #'@export
 #'@importFrom graphics abline lines par plot points
-plot.slopelm <- function (x, effect = "all", type = "statistic", multcomp = "slope_clustermass",
+plot.slopelm <- function (x, effect = "all", type = "statistic", multcomp = NULL,
                           alternative = "two.sided", enhanced_stat = FALSE, ...){
 
-  if( (multcomp == "slope_clustermass")&(alternative != "two.sided")){
+  dotargs=list()
+  if(is.null(dotargs$alpha)){alpha=0.05}
+  if(is.null(multcomp)){multcomp=x$multcomp[1]}
+
+  if( (multcomp%in%c("slope","glue")&(alternative != "two.sided"))){
     warning("alternative argument switch to two.sided, change multcomp argument. Only the two.sided test is available for slope_clustermass")
     alternative = "two.sided"
   }
 
-  if(multcomp != "slope_clustermass"){
+  if(!multcomp %in%c("slope","glue")){
     permuco:::plot.clusterlm(x = x, effect = effect, type = type, multcomp = multcomp,
                              alternative = alternative, enhanced_stat = enhanced_stat, ...)
   }else{
@@ -42,11 +46,11 @@ plot.slopelm <- function (x, effect = "all", type = "statistic", multcomp = "slo
 
 
     statistic = t(sapply(multiple_comparison, function(m) {
-      m[["uncorrected"]]$main[, 1]
+      m$uncorrected$main_avg[, 1]
     }))
 
     sstatistic = t(sapply(multiple_comparison, function(m) {
-      m[["uncorrected_slope"]]$main[, 1]
+      m$uncorrected$main_slope[, 1]
     }))
 
     if (enhanced_stat) {
@@ -92,12 +96,12 @@ plot.slopelm <- function (x, effect = "all", type = "statistic", multcomp = "slo
       plot(data[i, ], type = "l", xaxt = xaxt, xlab = "", ylab = rnames[i],ylim =ylim)
       if (type == "statistic") {
         lines(y = sdata[i, ], x = 1:length(sdata[i, ]),lty = 5)
-        xi = which(pvalue[i, ] < x$alpha)
+        xi = which(pvalue[i, ] < alpha)
         y = data[i, xi]
         col = "red"
         points(x = xi, y = y, pch = par()$pch, col = col)
 
-        xi = which(spvalue[i, ] < x$alpha)
+        xi = which(spvalue[i, ] < alpha)
         y = sdata[i, xi]
         col = "blue"
         points(x = xi, y = y, pch = par()$pch, col = col)

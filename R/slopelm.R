@@ -19,7 +19,7 @@
 #' @export
 #' @importFrom stats model.frame terms model.matrix contrasts<- update
 slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fisher",
-                     threshold = NULL, aggr_FUN = NULL, slope_FUN = NULL, multcomp = "clustermass",
+                     threshold = NULL, aggr_FUN = NULL, slope_FUN = NULL, multcomp = "slope",
                      ...){
   cl = match.call()
   if (is.null(data)) {

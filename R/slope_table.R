@@ -1,32 +1,43 @@
-slope_table = function(x,...){
-  dotargs = list(...)
-  ct = lapply(1:length(x), function(j) {
-    effect = x[[j]]
-    unique_cluster = unique(effect$slope_clustermass$main[, 3])
-    unique_cluster = unique_cluster[unique_cluster != 0]
-    if (length(unique_cluster) == 0) {
-      attr(table, "effect_name") = names(x)[j]
-      attr(table, "threshold") = effect$slope_clustermass$threshold
-      table = paste(names(x)[j], ", no cluster above a threshold of : ",
-                    round(effect$slope_clustermass$threshold, 5), sep = "")
-      return(table)
+slope_table = function(x, multcomp="slope", ...){
+  dotargs <- list(...)
+  ct <- lapply(1:length(x), function(j){
+    effect <- x[[j]]
+    info <- effect$uncorrected$test_info
+    unique_cluster <- unique(effect[[multcomp]]$main[,3])
+    unique_cluster <- unique_cluster[unique_cluster!=0]
+    if(length(unique_cluster)==0){
+      tab = data.frame()
+      attr(tab,"nocluster") = T
+    }else{
+      tab <- t(sapply(unique_cluster,function(i){
+        cl_select <- effect[[multcomp]]$main[,3] == i
+        timepoint <- c(1:length(cl_select))[cl_select]
+        c(timepoint[1],timepoint[length(timepoint)],
+          effect[[multcomp]]$main[timepoint[1],1],
+          effect[[multcomp]]$main[timepoint[1],2])
+
+      }))
+      tab <- data.frame(tab)
+      colnames(tab) <- c("start","end", "cluster mass", "P(>mass)")
+      rownames(tab) <- unique_cluster
+      attr(tab,"nocluster") <- F
     }
-    tab = t(sapply(unique_cluster, function(i) {
-      cl_select = effect$slope_clustermass$main[, 3] == i
-      timepoint = c(1:length(cl_select))[cl_select]
-      c(timepoint[1], timepoint[length(timepoint)], effect$slope_clustermass$main[timepoint[1],
-                                                                            1], effect$slope_clustermass$main[timepoint[1], 2])
-    }))
-    tab = data.frame(tab)
-    colnames(tab) = c("start", "end", "cluster mass", "P(>mass)")
-    rownames(tab) = unique_cluster
-    attr(tab, "threshold") = effect$slope_clustermass$threshold
-    attr(tab, "effect_name") = names(x)[j]
-    class(tab) = append("cluster_table", class(tab))
+    attr(tab,"threshold") <- effect[[multcomp]]$threshold
+    attr(tab,"fun_name") <- info$fun_name
+    attr(tab,"effect_name") <- names(x)[j]
+    attr(tab,"multcomp") <- multcomp
+    attr(tab,"nDV") <- info$nDV
+    attr(tab,"method") <- info$method
+    attr(tab,"test") <- info$test
+    attr(tab,"alternative") <- info$alternative
+    attr(tab,"df") <- info$df
+    attr(tab,"np") <- info$np
+    attr(tab,"table_type") <- "cluster"
+
+    class(tab) <- append("multcomp_table", class(tab))
     tab
   })
-  class(ct) = append("listof_cluster_table", class(ct))
-  names(ct) = names(x)
+  class(ct) <- append("listof_multcomp_table", class(ct))
+  names(ct) <- names(x)
   ct
-
 }
