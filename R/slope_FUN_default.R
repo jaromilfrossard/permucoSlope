@@ -18,10 +18,10 @@ slope_spline <- function(y, spar = .5){t(apply(y, 1, function(yi)predict(smooth.
 #' @importFrom locpol locpol EpaK
 #' @export
 slope_locpol = function(y, bw = 0.01, kernel = EpaK , deg = 1){
-  xi = c(1:NCOL(y))/NCOL(y)
-  out= apply(y, 1, function(yi){
-    df = data.frame(xi = xi, y = yi)
-    out = locpol(yi~xi, data = df, bw = bw, kernel = kernel, deg = deg, xeval = xi)
+  xi <- c(1:NCOL(y))/NCOL(y)
+  out<- apply(y, 1, function(yi){
+    df <- data.frame(xi = xi, y = yi)
+    out <- locpol(yi~xi, data = df, bw = bw, kernel = kernel, deg = deg, xeval = xi)
     locpol:::fitted.locpol(out, deg = 1)})
   t(out)
 }
@@ -32,26 +32,27 @@ slope_locpol = function(y, bw = 0.01, kernel = EpaK , deg = 1){
 #' @param y a matrix with multiple signals in rows and time in column
 #' @export
 slope_diff = function(y){
-  out = t(apply(y,1,diff))
-  out = cbind(out[,1],out)
+  out <- t(apply(y,1,diff))
+  out <- cbind(out[,1],out)
   return(out)
 }
 
 
-#' Compute the slope of multiple signal using Fourier
+#' Compute the slopes of multiple signals using Fourrier Transform
 #'
-#' @description compute the slope of multiple signal using the differentiation in the spectral space
+#' @description Compute the slopes of multiple signals using the differentiation in the frequency space
 #' @param y a matrix with multiple signals in rows and time in column
-#' @param ratio_max_mod a scalar indicating the limit a frequency deleted based on the maximal value of the amplitude of the signal.
-#' @importFrom spectral spec.fft
+#' @importFrom stats fft
 #' @export
-slope_spectral = function(y, ratio_max_mod = 10){
-  out = t(apply(y,1,function(yi){
-    ffti = spec.fft(y = as.numeric(scale(yi)), center = TRUE)
-    ffti$A[Mod(ffti$A)<(max(Mod(ffti$A))/ratio_max_mod)]=0
-    ffti$A <- ffti$A * 2 * pi * 1i * ffti$fx
-    Re(spec.fft(ffti)$y)
-  }))
+slope_spectral = function(y){
+  # out = t(apply(y,1,function(yi){
+  #   ffti = spec.fft(y = as.numeric(scale(yi)), center = TRUE)
+  #   #ffti$A[Mod(ffti$A)<(max(Mod(ffti$A))/ratio_max_mod)]=0
+  #   ffti$A <- ffti$A * 2 * pi * 1i * ffti$fx
+  #   Re(spec.fft(ffti)$y)
+  # }))
+  freq <- seq(from = -0.5,to=0.5,length.out = ncol(y))
+  out <- t(Re(fft(-2*pi*1i*freq*fft(t(y)),inverse = T)))/ncol(y)
 
   return(out)
 }
@@ -65,7 +66,7 @@ slope_spectral = function(y, ratio_max_mod = 10){
 #' @param slope_FUN the function to compute the slope. The second argument of this function is the parameter to adjust.
 #' @export
 slope_roughtness = function(y, slope_FUN = NULL){
-  param = match_roughness(y = y, slope_FUN = slope_FUN)[1,1]
+  param <- match_roughness(y = y, slope_FUN = slope_FUN)[1,1]
   return(slope_FUN(y, param))
 }
 

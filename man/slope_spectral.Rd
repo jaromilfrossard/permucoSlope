@@ -2,15 +2,13 @@
 % Please edit documentation in R/slope_FUN_default.R
 \name{slope_spectral}
 \alias{slope_spectral}
-\title{Compute the slope of multiple signal using Fourier}
+\title{Compute the slopes of multiple signals using Fourrier Transform}
 \usage{
-slope_spectral(y, ratio_max_mod = 10)
+slope_spectral(y)
 }
 \arguments{
 \item{y}{a matrix with multiple signals in rows and time in column}
-
-\item{ratio_max_mod}{a scalar indicating the limit a frequency deleted based on the maximal value of the amplitude of the signal.}
 }
 \description{
-compute the slope of multiple signal using the differentiation in the spectral space
+Compute the slopes of multiple signals using the differentiation in the frequency space
 }
