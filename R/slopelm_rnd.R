@@ -144,7 +144,9 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
     if("slope"%in%multcomp){
       multiple_comparison[[i]]$slope = compute_clustermass_slope(distribution = distribution, sdistribution = sdistribution,
                                                                              threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
-    }else if("glue"%in%multcomp){
+    }
+
+    if("glue"%in%multcomp){
       multiple_comparison[[i]]$glue = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
                                                                              threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
 

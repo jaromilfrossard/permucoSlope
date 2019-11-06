@@ -23,9 +23,9 @@ slopelm(formula, data = NULL, np = 5000, method = NULL,
 
 \item{aggr_FUN}{A function that will be used to aggregate the statistics of a cluster into one scalar. Default is the sum of squares fot t statistic and sum for F statistic.}
 
-\item{slope_FUN}{A function that will be used to compute the slope of the response variables. \code{slope_spline}, \code{slope_locpol} and \code{slope_diff} are available.}
+\item{slope_FUN}{A function that will be used to compute the slope of the response variables. \code{slope_spline}, \code{slope_locpol}, \code{slope_spectral} and \code{slope_diff} are available.}
 
-\item{multcomp}{A vector of character defining the methods of multiple comparisons to compute. Default is \code{"clustermass"}, and the additional options are available : \code{"tfce"},\code{"bonferroni"}, \code{"holm"}, \code{"troendle"} and \code{"benjaminin_hochberg"}.}
+\item{multcomp}{A vector of character defining the methods of multiple comparisons to compute. Default is \code{"slope"}, and \code{"glue"} is an additional option available. \code{"slope"} considers tests on signals and slopes equally and \code{"glue"} uses tests on slopes only to bind clusters.}
 
 \item{...}{Futher arguments, see details.}
 }
