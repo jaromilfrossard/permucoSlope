@@ -4,6 +4,7 @@ library(spectral)
 library(locpol)
 library(tidyr)
 library(dplyr)
+library(lpridge)
 library(ggplot2)
 
 lf = list.files("R/")
@@ -16,9 +17,36 @@ data("attentionshifting_design")
 data("attentionshifting_signal")
 
 y = as.matrix(attentionshifting_signal)
-dy = slope_spectral(y)
+dy = slope_locpol(y)
 design = attentionshifting_design
 
+rough_y = mean(roughness(y))
+
+t0=proc.time()
+optim(par = 0.2, fn = function(bwi){abs(mean(roughness(slope_lpepa(y,bw =bwi)))-rough_y)},
+      method = c("L-BFGS-B"),
+      lower = 0, upper = 1)
+t1=proc.time()
+t1-t0
+
+t0=proc.time()
+optim(par = 0.01, fn = function(bwi){abs(mean(roughness(slope_lpepa(y,bw =bwi)))-rough_y)},
+      method = c("Nelder-Mead"),
+      lower = 0, upper = 1)
+t1=proc.time()
+t1-t0
+
+match_roughness(y,slope_lpepa,par0 = 0.1)
+
+ts.plot(t(slope_lpepa(y,bw = 0.04816434)))
+
+ts.plot(t(y))
+
+plot(slope_lpepa(y))
+
+
+plot(out[1,],dy[1,]/819)
+abline(0,1)
 
 tidydata = cbind(design,y)%>%
   gather(time,ampl,10:828)%>%
