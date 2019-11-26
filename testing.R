@@ -1,6 +1,10 @@
 set.seed(42)
 library(permuco)
 library(spectral)
+library(locpol)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
 
 lf = list.files("R/")
 for(fi in lf){
@@ -13,6 +17,51 @@ data("attentionshifting_signal")
 
 y = as.matrix(attentionshifting_signal)
 dy = slope_spectral(y)
+design = attentionshifting_design
+
+
+tidydata = cbind(design,y)%>%
+  gather(time,ampl,10:828)%>%
+  mutate(time=as.numeric(time))%>%
+  unite(id_obs, id, visibility,emotion,direction,remove = F)
+
+tidydata%>%
+  filter(id%in%c("S09","S10"))%>%
+  ggplot(aes(x=time,y=ampl,color=id,group=id_obs))+
+  geom_line()
+
+
+design$roughness = roughness(y)
+design$ii = 1:nrow(design)
+design%>%
+  filter(id%in%c("S07","S09"))
+
+design%>%
+  ggplot(aes(y=roughness,color=id,x=ii))+
+  geom_point()
+
+
+
+
+mr = match_roughness(y, slope_FUN = slope_locpol, par0 = 0.02, opt_FUN = roughness, tol = 1e-05, step0 = 0.02,max_it = 200,cold = 0.89)
+
+rs = roughness(slope_locpol(y,bw = 0.04826193))
+
+plot(cbind(rs,roughness(y)))
+
+r1 = y%>%
+  t%>%
+  apply(2,diff)%>%
+  apply(2,diff)%>%
+  apply(2,sd)
+
+y%>%
+  apply(1,mean)
+
+
+
+plot(roughness(y),r1,col=)
+
 
 i = 2
 yi =scale(y[i,])
