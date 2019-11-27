@@ -17,12 +17,12 @@ plot.slopelm <- function (x, effect = "all", type = "statistic", multcomp = NULL
   if(is.null(dotargs$alpha)){alpha=0.05}
   if(is.null(multcomp)){multcomp=x$multcomp[1]}
 
-  if( (multcomp%in%c("slope","glue")&(alternative != "two.sided"))){
+  if( (multcomp%in%c("slope","glue","halfbw","slopebinder")&(alternative != "two.sided"))){
     warning("alternative argument switch to two.sided, change multcomp argument. Only the two.sided test is available for slope_clustermass")
     alternative = "two.sided"
   }
 
-  if(!multcomp %in%c("slope","glue")){
+  if(!multcomp %in%c("slope","glue","halfbw","slopebinder")){
     permuco:::plot.clusterlm(x = x, effect = effect, type = type, multcomp = multcomp,
                              alternative = alternative, enhanced_stat = enhanced_stat, ...)
   }else{

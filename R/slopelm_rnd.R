@@ -1,6 +1,6 @@
 slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
           np, P, rnd_rotation, aggr_FUN, E, H, cl, multcomp, alpha, slope_FUN,
-          p_scale, return_distribution, ndh, new_method)
+          p_scale, return_distribution, ndh, new_method,bw)
 {
   if (is.null(method)) {
     method = "Rd_kheradPajouh_renaud"
@@ -149,6 +149,13 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
     if("glue"%in%multcomp){
       multiple_comparison[[i]]$glue = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
                                                                              threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
+
+    }
+
+    if("halfbw"%in%multcomp){
+      multiple_comparison[[i]]$glue = compute_clustermass_halfbw(distribution = distribution, sdistribution = sdistribution,
+                                                                 threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided",
+                                                                 bw = bw)
 
     }
 

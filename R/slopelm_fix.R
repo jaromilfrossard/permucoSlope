@@ -2,7 +2,7 @@
 #' @importFrom permuco Pmat
 slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotation,
             aggr_FUN, slope_FUN, E, H, cl, multcomp, alpha, p_scale, coding_sum,
-            ndh, return_distribution, new_method){
+            ndh, return_distribution, new_method,bw){
   if (is.null(method)) {
     method = "freedman_lane"
   }
@@ -208,6 +208,19 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
     if("glue"%in%multcomp){
       multiple_comparison[[i]]$glue = compute_clustermass_glue(distribution = distribution, sdistribution = sdistribution,
                                                                threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
+
+    }
+
+    if("halfbw"%in%multcomp){
+      multiple_comparison[[i]]$halfbw = compute_clustermass_halfbw(distribution = distribution, sdistribution = sdistribution,
+                                                               threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided",
+                                                               bw = bw)
+
+    }
+
+    if("slopebinder"%in%multcomp){
+      multiple_comparison[[i]]$slopebinder = compute_clustermass_slopebinder(distribution = distribution, sdistribution = sdistribution,
+                                                                   threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided")
 
     }
 

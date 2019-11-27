@@ -17,92 +17,55 @@ data("attentionshifting_design")
 data("attentionshifting_signal")
 
 y = as.matrix(attentionshifting_signal)
-dy = slope_locpol(y)
 design = attentionshifting_design
 
-rough_y = mean(roughness(y))
+optimal = optim_roughness(y,slope_lpepa,roughness_FUN = roughness)
+bw = optimal$par
+myslope_FUN = function(x)(slope_lpepa(x,bw = bw))
 
-t0=proc.time()
-optim(par = 0.2, fn = function(bwi){abs(mean(roughness(slope_lpepa(y,bw =bwi)))-rough_y)},
-      method = c("L-BFGS-B"),
-      lower = 0, upper = 1)
-t1=proc.time()
-t1-t0
+cl = clusterlm(attentionshifting_signal~visibility*emotion*direction, slope_FUN = myslope_FUN,
+             data=attentionshifting_design,np =10)
+cl$multiple_comparison$visibility$clustermass$threshold
 
-t0=proc.time()
-optim(par = 0.01, fn = function(bwi){abs(mean(roughness(slope_lpepa(y,bw =bwi)))-rough_y)},
-      method = c("Nelder-Mead"),
-      lower = 0, upper = 1)
-t1=proc.time()
-t1-t0
-
-match_roughness(y,slope_lpepa,par0 = 0.1)
-
-ts.plot(t(slope_lpepa(y,bw = 0.04816434)))
-
-ts.plot(t(y))
-
-plot(slope_lpepa(y))
+gl = slopelm(attentionshifting_signal~visibility*emotion*direction, slope_FUN = myslope_FUN,
+             data=attentionshifting_design,np =2000,multcomp = c("slope","glue","halfbw","slopebinder"),
+             bw = bw, return_distribution=T)
 
 
-plot(out[1,],dy[1,]/819)
-abline(0,1)
+diffs= (sapply(gl$multiple_comparison,function(eff){
+  eff$slopebinder$distribution-eff$glue$distribution
+}))
+d_sb = gl$multiple_comparison$visibility$slopebinder$distribution
+d_gl = gl$multiple_comparison$visibility$glue$distribution
 
-tidydata = cbind(design,y)%>%
-  gather(time,ampl,10:828)%>%
-  mutate(time=as.numeric(time))%>%
-  unite(id_obs, id, visibility,emotion,direction,remove = F)
-
-tidydata%>%
-  filter(id%in%c("S09","S10"))%>%
-  ggplot(aes(x=time,y=ampl,color=id,group=id_obs))+
-  geom_line()
+cbind(d_sb,d_gl)
 
 
-design$roughness = roughness(y)
-design$ii = 1:nrow(design)
-design%>%
-  filter(id%in%c("S07","S09"))
+summary(gl,multcomp = "slope")$visibility
 
-design%>%
-  ggplot(aes(y=roughness,color=id,x=ii))+
-  geom_point()
+summary(gl,multcomp = "slopebinder")$visibility
+summary(gl,multcomp = "glue")$visibility
 
+plot(gl,multcomp = "slopebinder")
 
+plot(gl,multcomp = "slope")
 
 
-mr = match_roughness(y, slope_FUN = slope_locpol, par0 = 0.02, opt_FUN = roughness, tol = 1e-05, step0 = 0.02,max_it = 200,cold = 0.89)
+main = gl$multiple_comparison$visibility$slopebinder$main
+main = cbind(main,gl$multiple_comparison$visibility$uncorrected$main_avg[,1])
 
-rs = roughness(slope_locpol(y,bw = 0.04826193))
+main[-c(1:300),]
 
-plot(cbind(rs,roughness(y)))
+distribution = gl$multiple_comparison$visibility$uncorrected$distribution
+sdistribution = gl$multiple_comparison$visibility$uncorrected$sdistribution
+threshold = gl$multiple_comparison$visibility$slope$threshold
+aggr_FUN = sum
+bw = bw
+alternative = "two.sided"
 
-r1 = y%>%
-  t%>%
-  apply(2,diff)%>%
-  apply(2,diff)%>%
-  apply(2,sd)
-
-y%>%
-  apply(1,mean)
-
-
-
-plot(roughness(y),r1,col=)
-
-
-i = 2
-yi =scale(y[i,])
-dyi =scale(dy[i,])
-ylim = range(c(yi,dyi))
-plot(yi,ylim=ylim)
-lines(dyi,col="red")
-
-
-
-gl = slopelm(attentionshifting_signal~visibility*emotion*direction,
-             data=attentionshifting_design,np =10,multcomp = "glue")
-
+compute_clustermass_halfbw()
+gl$multiple_comparison$visibility$halfbw$distribution
+gl$multiple_comparison$visibility$glue$distribution
 
 plot(gl)
 

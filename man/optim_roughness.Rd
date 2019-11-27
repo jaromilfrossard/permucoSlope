@@ -5,7 +5,8 @@
 \title{Compute the optimal smoothing parameter of slope_FUN}
 \usage{
 optim_roughness(y, slope_FUN, par = 0.5, avg_FUN = mean,
-  method = c("Nelder-Mead"))
+  roughness_FUN = roughness, method = c("Brent"), lower = 0,
+  upper = 1)
 }
 \arguments{
 \item{y}{matrix of the signals.}
@@ -14,10 +15,19 @@ optim_roughness(y, slope_FUN, par = 0.5, avg_FUN = mean,
 
 \item{par}{initial value of the smoothing paramter. Default is 0.5.}
 
-\item{avg_FUN}{function to aggregate the rougness of each signal. Defaults is the methd.}
+\item{avg_FUN}{function to aggregate the rougness of each signal. Defaults is the method.}
 
-\item{method}{optimizer from \code{optim}. Defaults is "Nelder-Mead".}
+\item{roughness_FUN}{function of roughness to optimize}
+
+\item{method}{optimizer from \code{optim}. Defaults is "Brent".}
+
+\item{lower}{a scalar indicating the lower bound of \code{par}.}
+
+\item{upper}{a scalar indicating the upper bound of \code{par}.}
 }
 \description{
 Find smoothing paramters that matches rougness of original signal and of their slope
+}
+\details{
+Check \code{optim} function.
 }

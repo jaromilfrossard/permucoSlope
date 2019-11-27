@@ -67,13 +67,14 @@ slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fis
   }
   if (is.null(indError)) {
     result <- slopelm_fix(formula = formula, data = data, slope_FUN = slope_FUN,
-                            method = method, test = test, np = np, P = dotargs$P,
-                            rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
-                            E = dotargs$E, H = dotargs$H, threshold = threshold,
-                            return_distribution = dotargs$return_distribution,
-                            cl = cl, multcomp = multcomp, alpha = dotargs$alpha,
-                            p_scale = dotargs$p_scale, coding_sum = dotargs$coding_sum,
-                            ndh = dotargs$ndh, new_method = dotargs$new_method)
+                          method = method, test = test, np = np, P = dotargs$P,
+                          rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
+                          E = dotargs$E, H = dotargs$H, threshold = threshold,
+                          return_distribution = dotargs$return_distribution,
+                          cl = cl, multcomp = multcomp, alpha = dotargs$alpha,
+                          p_scale = dotargs$p_scale, coding_sum = dotargs$coding_sum,
+                          ndh = dotargs$ndh, new_method = dotargs$new_method,
+                          bw = dotargs$bw)
   }
   else if (!is.null(indError)) {
     if (test != "fisher") {
@@ -81,13 +82,14 @@ slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fis
       test = "fisher"
     }
     result <- slopelm_rnd(formula = formula, data = data, slope_FUN = slope_FUN,
-                            method = method, test = test, np = np, P = dotargs$P,
-                            rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
-                            E = dotargs$E, H = dotargs$H, threshold = threshold,
-                            return_distribution = dotargs$return_distribution,
-                            cl = cl, multcomp = multcomp, alpha = dotargs$alpha,
-                            p_scale = dotargs$p_scale, coding_sum = dotargs$coding_sum,
-                            ndh = dotargs$ndh, new_method = dotargs$new_method)
+                          method = method, test = test, np = np, P = dotargs$P,
+                          rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
+                          E = dotargs$E, H = dotargs$H, threshold = threshold,
+                          return_distribution = dotargs$return_distribution,
+                          cl = cl, multcomp = multcomp, alpha = dotargs$alpha,
+                          p_scale = dotargs$p_scale, coding_sum = dotargs$coding_sum,
+                          ndh = dotargs$ndh, new_method = dotargs$new_method,
+                          bw = dotargs$bw)
   }
   return(result)
 }
