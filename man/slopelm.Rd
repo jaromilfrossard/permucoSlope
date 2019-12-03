@@ -4,9 +4,18 @@
 \alias{slopelm}
 \title{Compute cluster-mass statistics using the mean and the slope of the signal}
 \usage{
-slopelm(formula, data = NULL, np = 5000, method = NULL,
-  test = "fisher", threshold = NULL, aggr_FUN = NULL,
-  slope_FUN = NULL, multcomp = "slope", ...)
+slopelm(
+  formula,
+  data = NULL,
+  np = 5000,
+  method = NULL,
+  test = "fisher",
+  threshold = NULL,
+  aggr_FUN = NULL,
+  slope_FUN = NULL,
+  multcomp = "slope",
+  ...
+)
 }
 \arguments{
 \item{formula}{A formula object where the left part is a matrix defined in the global environnement.}

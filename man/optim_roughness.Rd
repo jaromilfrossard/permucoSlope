@@ -4,9 +4,16 @@
 \alias{optim_roughness}
 \title{Compute the optimal smoothing parameter of slope_FUN}
 \usage{
-optim_roughness(y, slope_FUN, par = 0.5, avg_FUN = mean,
-  roughness_FUN = roughness, method = c("Brent"), lower = 0,
-  upper = 1)
+optim_roughness(
+  y,
+  slope_FUN,
+  par = 0.5,
+  avg_FUN = mean,
+  roughness_FUN = roughness,
+  method = c("Brent"),
+  lower = 0,
+  upper = 1
+)
 }
 \arguments{
 \item{y}{matrix of the signals.}

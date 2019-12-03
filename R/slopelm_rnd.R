@@ -152,8 +152,12 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
 
     }
 
+
+    return(list(distribution = distribution, sdistribution = sdistribution,
+                                           threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided",
+                                           bw = bw))
     if("halfbw"%in%multcomp){
-      multiple_comparison[[i]]$glue = compute_clustermass_halfbw(distribution = distribution, sdistribution = sdistribution,
+      multiple_comparison[[i]]$halfbw = compute_clustermass_halfbw(distribution = distribution, sdistribution = sdistribution,
                                                                  threshold = threshold[i], aggr_FUN =aggr_FUN,alternative = "two.sided",
                                                                  bw = bw)
 
@@ -177,7 +181,7 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
   out$multiple_comparison = multiple_comparison
   out$data = mf
   out$method = method
-  #out$alpha = alpha
+  out$bw = bw
   out$multcomp = multcomp
   out$threshold = threshold
   out$test = test

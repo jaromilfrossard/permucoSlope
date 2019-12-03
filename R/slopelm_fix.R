@@ -286,6 +286,7 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
   out$model.matrix = mm
   out$test = test
   out$threshold = threshold
+  out$bw = bw
   out$P = P
   out$np = np
   out$rnd_rotation = rnd_rotation

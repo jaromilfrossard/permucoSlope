@@ -13,6 +13,36 @@ for(fi in lf){
   source(paste0("R/",fi))
 }
 
+
+###real data eda channel 48
+### load eda
+dir = "../../article/eeg_instruction/data/"
+
+
+
+load(paste0(dir,"signal_design_anova_3f.RData"))
+finstr = signali~instruction*emotion*sex_stimuli +Error(participant/(instruction*emotion*sex_stimuli))
+i = 48
+signali = signal[,,i]
+
+
+optim = optim_roughness(signali,slope_FUN = slope_lpepa)
+mybw =optim$par
+myslope_FUN = function(x){slope_lpepa(x,bw = mybw)}
+
+
+scm_lpepa = slopelm(finstr,data=design,np=5,slope_FUN = myslope_FUN,multcomp = c("slope","glue","slopebinder","halfbw"))
+
+distribution = scm_lpepa$distribution
+sdistribution = scm_lpepa$sdistribution
+threshold = scm_lpepa$threshold
+aggr_FUN = scm_lpepa$aggr_FUN
+alternative = scm_lpepa$alternative
+bw = scm_lpepa$bw
+
+
+
+
 data("attentionshifting_design")
 data("attentionshifting_signal")
 

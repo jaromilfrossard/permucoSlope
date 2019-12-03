@@ -4,9 +4,15 @@
 \alias{plot.slopelm}
 \title{Plot method for slopelm object}
 \usage{
-\method{plot}{slopelm}(x, effect = "all", type = "statistic",
-  multcomp = NULL, alternative = "two.sided", enhanced_stat = FALSE,
-  ...)
+\method{plot}{slopelm}(
+  x,
+  effect = "all",
+  type = "statistic",
+  multcomp = NULL,
+  alternative = "two.sided",
+  enhanced_stat = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{a slopelm object}
