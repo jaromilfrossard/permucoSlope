@@ -1,7 +1,7 @@
 #' @importFrom stats as.formula contr.sum model.response rnorm qt qf lm.fit
 #' @importFrom permuco Pmat
-slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotation,
-            aggr_FUN, slope_FUN, E, H, cl, multcomp, alpha, p_scale, coding_sum,
+slopelm_fix <- function(formula, data, method, type, test, threshold, np, P, rnd_rotation,
+            aggr_FUN, E, H, cl, multcomp, alpha, p_scale, coding_sum,
             ndh, return_distribution, new_method,bw){
   if (is.null(method)) {
     method = "freedman_lane"
@@ -101,18 +101,18 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
   if (is.null(P)) {
     switch(method, huh_jhun = {
       switch(test, t = {
-        P <- Pmat(np = np, n = NROW(y) - NCOL(mm) + 1)
+        P <- Pmat(np = np, n = NROW(y) - NCOL(mm) + 1, type = type)
       }, fisher = {
         {
           P <- lapply(as.numeric(table(col_ref))[-1],
                       function(cx) {
                         Pmat(np = np, n = NROW(y) - NCOL(mm) +
-                               cx)
+                               cx, type = type)
                       })
         }
       })
     }, {
-      P = Pmat(np = np, n = NROW(y))
+      P = Pmat(np = np, n = NROW(y),  type = type)
     })
   }
   if (sum(permuco:::np.matrix(P) <= 1999) > 0) {
@@ -152,7 +152,21 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
     threshold = as.numeric(matrix(threshold, nrow = length(colx)))
   }
 
-  sy = slope_FUN(y)
+  slope_FUN <- eval(cl$slope_FUN)
+  slope_FUN_name <- paste(cl$slope_FUN)
+
+  if(slope_FUN_name%in%c("slope_lpepa","slope_locpol","slope_spline")){
+    cat("Optimizsation of smoothing parameter such that roughess(y) = roughess(slope_FUN(y)).\n")
+    optim <- optim_roughness(y,slope_FUN = slope_FUN )
+    slope_FUN_par <- optim$par
+    sy = slope_FUN(y, slope_FUN_par)
+  }else{
+    slope_FUN_par <- NULL
+    sy = eval(slope_FUN)(y)
+
+  }
+
+
 
   args <- list(y = y, mm = mm, P = P, rnd_rotation = rnd_rotation,
                test = test)
@@ -174,7 +188,8 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
     multiple_comparison[[i]]$uncorrected = list(main_avg = cbind(statistic = distribution[1,], pvalue = pvalue),
                                                 main_slope = cbind(statistic = sdistribution[1,], pvalue = spvalue),
                                                 test_info = list(test = test, df = df[i,], alternative = "two.sided", method = method, np = np,
-                                                                 nDV = ncol(y), fun_name = fun_name))
+                                                                 nDV = ncol(y), fun_name = fun_name, type = attr(args$P,"type"),
+                                                                 slope_FUN_name = slope_FUN_name, slope_FUN_par = slope_FUN_par))
 
     if (return_distribution) {
       multiple_comparison[[i]]$uncorrected$distribution = distribution
@@ -298,6 +313,11 @@ slopelm_fix <- function(formula, data, method, test, threshold, np, P, rnd_rotat
   # out$slope_table = slope_table
   # out$cluster_table_greater = cluster_table_greater
   # out$cluster_table_less = cluster_table_less
+
+  out$slope_FUN_name = slope_FUN_name
+  out$slope_FUN = slope_FUN
+  out$slope_FUN_par = slope_FUN_par
+
   out$alpha = alpha
   out$method = method
   out$fun_name = fun_name

@@ -1,4 +1,4 @@
-slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
+slopelm_rnd <- function (formula, data, method,type, test, coding_sum, threshold,
           np, P, rnd_rotation, aggr_FUN, E, H, cl, multcomp, alpha, slope_FUN,
           p_scale, return_distribution, ndh, new_method,bw)
 {
@@ -77,14 +77,27 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
   name <- colnames(mm_f)
   permuco:::checkBalancedData(fixed_formula = formula_f, data = cbind(mf))
   if (is.null(P)) {
-    P = Pmat(np = np, n = NROW(y))
+    P = Pmat(np = np, n = NROW(y), type = type)
   }
   if (sum(permuco:::np.matrix(P) <= 1999) > 0){
     warning("The number of permutations is below 2000, p-values might be unreliable.")
   }
   np <- permuco:::np.matrix(P)
 
-  sy = slope_FUN(y)
+  slope_FUN <- eval(cl$slope_FUN)
+  slope_FUN_name <- paste(cl$slope_FUN)
+
+  if(slope_FUN_name%in%c("slope_lpepa","slope_locpol","slope_spline")){
+    cat("Optimizsation of smoothing parameter such that roughess(y) = roughess(slope_FUN(y)).\n")
+    optim <- optim_roughness(y,slope_FUN = slope_FUN )
+    slope_FUN_par <- optim$par
+    sy = slope_FUN(y, slope_FUN_par)
+  }else{
+    slope_FUN_par <- NULL
+    sy = eval(slope_FUN)(y)
+
+  }
+
 
   args <- list(y = y, mm = mm_f, mm_id = mm_id, link = link,
                P = P)
@@ -119,7 +132,8 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
     multiple_comparison[[i]]$uncorrected = list(main_avg = cbind(statistic = distribution[1,], pvalue = pvalue),
                                                 main_slope = cbind(statistic = sdistribution[1,], pvalue = spvalue),
                                                 test_info = list(test = test, df = df[i,], alternative = "two.sided", method = method, np = np,
-                                                                 nDV = ncol(y), fun_name = fun_name))
+                                                                 nDV = ncol(y), fun_name = fun_name,type = attr(args$P,"type"),
+                                                                 slope_FUN_name = slope_FUN_name, slope_FUN_par = slope_FUN_par))
 
     if (return_distribution) {
       multiple_comparison[[i]]$uncorrected$distribution = distribution
@@ -183,6 +197,11 @@ slopelm_rnd <- function (formula, data, method, test, coding_sum, threshold,
   out$np = np
   # out$cluster_table = cluster_table
   # out$slope_table = slope_table
+
+  out$slope_FUN_name = slope_FUN_name
+  out$slope_FUN = slope_FUN
+  out$slope_FUN_par = slope_FUN_par
+
   out$multiple_comparison = multiple_comparison
   out$data = mf
   out$method = method

@@ -25,13 +25,18 @@ slope_table = function(x, multcomp="slope", ...){
     attr(tab,"threshold") <- effect[[multcomp]]$threshold
     attr(tab,"fun_name") <- info$fun_name
     attr(tab,"effect_name") <- names(x)[j]
-    attr(tab,"multcomp") <- multcomp
+    attr(tab,"multcomp") <- paste0(multcomp,", slope_FUN = ", info$slope_FUN_name, ", param = ", info$slope_FUN_par)
     attr(tab,"nDV") <- info$nDV
     attr(tab,"method") <- info$method
     attr(tab,"test") <- info$test
     attr(tab,"alternative") <- info$alternative
+    attr(tab,"type") = info$type
     attr(tab,"df") <- info$df
     attr(tab,"np") <- info$np
+    ##
+    attr(tab,"slope_FUN_name") <- info$slope_FUN_name
+    attr(tab,"slope_FUN_par") <- info$slope_FUN_par
+    ##
     attr(tab,"table_type") <- "cluster"
 
     class(tab) <- append("multcomp_table", class(tab))

@@ -5,10 +5,11 @@
 #' @param data A data frame for the independant variables.
 #' @param np The number of permutations. Default value is \code{5000}.
 #' @param method A character string indicating the method used to handle nuisance variables. Default is \code{NULL} and will switch to \code{"freedman_lane"} for the fixed effects model and to \code{"Rd_kheradPajouh_renaud"} for the repeated measures ANOVA. See \link{lmperm} or \link{aovperm} for details on the permutation methods.
+#' @param type A character string indicating the type of resampling. Default is \code{"permutation"} and \code{"signflip"} is also available.
 #' @param test A character string to specify the name of the test. Default is \code{"fisher"}. \code{"t"} is available for the fixed effects model.
 #' @param threshold A numerical vector that specify the limit of a cluster for the \code{"clustermass"} multiple comparisons procedure. If it is a vector each value will be associated to an effect. If it is vector the same threshold will be used for each test. Default value is \code{NULL} and will compute a threshold based on the 0.95 quantile of the choosen test statistic.
 #' @param aggr_FUN A function that will be used to aggregate the statistics of a cluster into one scalar. Default is the sum of squares fot t statistic and sum for F statistic.
-#' @param slope_FUN A function that will be used to compute the slope of the response variables. \code{slope_spline}, \code{slope_locpol}, \code{slope_spectral} and \code{slope_diff} are available.
+#' @param slope_FUN A function that will be used to compute the slope of the response variables. Default is  \code{slope_lpepa} (local polynomial) and \code{slope_spline} or \code{slope_diff} are also available.
 #' @param multcomp A vector of character defining the methods of multiple comparisons to compute. Default is \code{"slope"}, and \code{"glue"} is an additional option available. \code{"slope"} considers tests on signals and slopes equally and \code{"glue"} uses tests on slopes only to bind clusters.
 #' @param ... Futher arguments, see details.
 #' @return A list containing : a table of the clusters, or a \code{multcomp} object for the other multiple comparison procedures. Use the \link{plot.slopelm} method to have a quick overview of the results.
@@ -18,10 +19,14 @@
 #' @author jaromil.frossard@unige.ch
 #' @export
 #' @importFrom stats model.frame terms model.matrix contrasts<- update
-slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fisher",
-                     threshold = NULL, aggr_FUN = NULL, slope_FUN = NULL, multcomp = "slope",
+slopelm <- function (formula, data = NULL, np = 5000, method = NULL,  type = "permutation", test = "fisher",
+                     threshold = NULL, aggr_FUN = NULL, slope_FUN = slope_lpepa, multcomp = "slope",
                      ...){
-  cl = match.call()
+
+  fo <- formals()
+  cl <- match.call()
+  cl <- as.call(c(as.list(cl),fo[!names(fo)%in%c(names(cl)[-1],"...")]))
+
   if (is.null(data)) {
     data <- model.frame(formula = formula)
   }
@@ -29,9 +34,10 @@ slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fis
   indError <- attr(Terms, "specials")$Error
   dotargs = list(...)
 
-  if (is.null(slope_FUN)) {
-    slope_FUN = slope_spline
-  }
+  # if (is.null(slope_FUN)) {
+  #   slope_FUN = slope_spline
+  # }
+
 
   if (is.null(dotargs$alpha)) {
     dotargs$alpha = 0.05
@@ -66,8 +72,8 @@ slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fis
     })
   }
   if (is.null(indError)) {
-    result <- slopelm_fix(formula = formula, data = data, slope_FUN = slope_FUN,
-                          method = method, test = test, np = np, P = dotargs$P,
+    result <- slopelm_fix(formula = formula, data = data,
+                          method = method, type = type, test = test, np = np, P = dotargs$P,
                           rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
                           E = dotargs$E, H = dotargs$H, threshold = threshold,
                           return_distribution = dotargs$return_distribution,
@@ -75,6 +81,22 @@ slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fis
                           p_scale = dotargs$p_scale, coding_sum = dotargs$coding_sum,
                           ndh = dotargs$ndh, new_method = dotargs$new_method,
                           bw = dotargs$bw)
+
+    # ci = call("clusterlm_fix",list(formula = formula, data = data, slope_FUN = slope_FUN,
+    #              method = method, type = type, test = test, np = np, P = dotargs$P,
+    #              rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
+    #              E = dotargs$E, H = dotargs$H, threshold = threshold,
+    #              return_distribution = dotargs$return_distribution,
+    #              cl = cl, multcomp = multcomp, alpha = dotargs$alpha,
+    #              p_scale = dotargs$p_scale, coding_sum = dotargs$coding_sum,
+    #              ndh = dotargs$ndh, new_method = dotargs$new_method,
+    #              bw = dotargs$bw))
+    # print(ci)
+    # result <- eval(ci)
+    #
+    # print(result)
+
+
   }
   else if (!is.null(indError)) {
     if (test != "fisher") {
@@ -82,7 +104,7 @@ slopelm <- function (formula, data = NULL, np = 5000, method = NULL, test = "fis
       test = "fisher"
     }
     result <- slopelm_rnd(formula = formula, data = data, slope_FUN = slope_FUN,
-                          method = method, test = test, np = np, P = dotargs$P,
+                          method = method, type = type,test = test, np = np, P = dotargs$P,
                           rnd_rotation = dotargs$rnd_rotation, aggr_FUN = aggr_FUN,
                           E = dotargs$E, H = dotargs$H, threshold = threshold,
                           return_distribution = dotargs$return_distribution,

@@ -1,4 +1,5 @@
 set.seed(42)
+rm(list = ls())
 library(permuco)
 library(spectral)
 library(locpol)
@@ -16,11 +17,66 @@ for(fi in lf){
 
 ###real data eda channel 48
 ### load eda
-dir = "../../article/eeg_instruction/data/"
+#dir = "../../article/eeg_instruction/data/"
+
+data("attentionshifting_design")
+data("attentionshifting_signal")
+my_FUN <- slope_locpol
+
+slm_lpepa = slopelm(attentionshifting_signal~visibility*emotion*direction,
+             data=attentionshifting_design,np =10,slope_FUN = slope_lpepa)
 
 
+slm_lpepa = slopelm(attentionshifting_signal~visibility*emotion*direction+Error(id/(visibility*emotion*direction)),
+                    data=attentionshifting_design,np =10,slope_FUN = slope_spline)
 
-load(paste0(dir,"signal_design_anova_3f.RData"))
+slm_lpepa$slope_FUN()
+
+si<- summary(slm_lpepa)
+class(si)
+summary.slopelm
+
+slm_spline  = slopelm(attentionshifting_signal~visibility*emotion*direction,
+             data=attentionshifting_design,np =10,slope_FUN = slope_spline)
+
+
+ts.plot(t(slm_lpepa$sy))
+ts.plot(t(slm_spline$sy))
+
+callslop_FUNi(attentionshifting_signal)
+call(slop_FUNi)
+
+fo[!names(fo)%in%c(names(cl)[-1],"...")]
+cli <- as.call(c(as.list(cl),fo[!names(fo)%in%c(names(cl)[-1],"...")]))
+cl$slope_FUN
+
+y <- attentionshifting_signal
+slope_FUN = slope_locpol
+t0 <- proc.time()
+opt <- optim_roughness(y,slope_FUN = slope_FUN )
+t1<- proc.time()
+t0-t1
+mean(roughness(slope_FUN(y,opt$par)))
+
+
+slope_FUN = slope_lpepa
+t0 <- proc.time()
+opt2 <- optim_roughness(y,slope_FUN = slope_FUN )
+t1 <- proc.time()
+t0-t1
+mean(roughness(y))
+mean(roughness(slope_FUN(y,opt2$par)))
+
+
+sl = slopelm(attentionshifting_signal~visibility*emotion*direction,
+             data=attentionshifting_design,np =10)
+sl
+
+cl = clusterlm(attentionshifting_signal~visibility*emotion*direction,
+               data=attentionshifting_design,np =10)
+
+
+#load(paste0(dir,"signal_design_anova_3f.RData"))
 finstr = signali~instruction*emotion*sex_stimuli +Error(participant/(instruction*emotion*sex_stimuli))
 i = 48
 signali = signal[,,i]
